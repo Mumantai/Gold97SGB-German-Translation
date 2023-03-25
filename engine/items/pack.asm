@@ -58,7 +58,7 @@ Pack:
 	call Pack_InitGFX
 	ld a, [wPackJumptableIndex]
 	ld [wJumptableIndex], a
-	call Pack_InitColors
+	call Pack_InitColorsBluegreen
 	ret
 
 .InitItemsPocket:
@@ -66,8 +66,8 @@ Pack:
 	ld [wCurPocket], a
 	call ClearPocketList
 	call DrawPocketName
-	call WaitBGMap_DrawPackGFX
 	call Pack_JumptableNext
+	call Pack_InitColorsBluegreen
 	ret
 
 .ItemsPocketMenu:
@@ -94,8 +94,8 @@ Pack:
 	ld [wCurPocket], a
 	call ClearPocketList
 	call DrawPocketName
-	call WaitBGMap_DrawPackGFX
 	call Pack_JumptableNext
+	call Pack_InitColorsYellowred
 	ret
 
 .KeyItemsPocketMenu:
@@ -124,8 +124,8 @@ Pack:
 	call DrawPocketName
 	xor a
 	ldh [hBGMapMode], a
-	call WaitBGMap_DrawPackGFX
 	call Pack_JumptableNext
+	call Pack_InitColorsYellowred
 	ret
 
 .TMHMPocketMenu:
@@ -159,7 +159,7 @@ Pack:
 
 .MenuHeader1:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 7, SCREEN_WIDTH - 14, TEXTBOX_Y - 1
+	menu_coords 0, 7, SCREEN_WIDTH - 13, TEXTBOX_Y - 1
 	dw .MenuData_1
 	db 1 ; default option
 
@@ -175,7 +175,7 @@ Pack:
 
 .MenuHeader2:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 5, SCREEN_WIDTH - 14, TEXTBOX_Y - 1
+	menu_coords 0, 5, SCREEN_WIDTH - 13, TEXTBOX_Y - 1
 	dw .MenuData_2
 	db 1 ; default option
 
@@ -188,7 +188,7 @@ Pack:
 
 .Jumptable2:
 	dw .UseItem
-	dw GiveItem
+	dw GiveItemTM
 	dw QuitItemSubmenu
 
 .UseItem:
@@ -207,8 +207,7 @@ Pack:
 	xor a
 	ldh [hBGMapMode], a
 	call Pack_InitGFX
-	call WaitBGMap_DrawPackGFX
-	call Pack_InitColors
+	call Pack_InitColorsYellowred
 	ret
 
 .InitBallsPocket:
@@ -216,8 +215,8 @@ Pack:
 	ld [wCurPocket], a
 	call ClearPocketList
 	call DrawPocketName
-	call WaitBGMap_DrawPackGFX
 	call Pack_JumptableNext
+	call Pack_InitColorsBluegreen
 	ret
 
 .BallsPocketMenu:
@@ -310,7 +309,7 @@ Pack:
 
 MenuHeader_UsableKeyItem:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 2, SCREEN_WIDTH - 14, TEXTBOX_Y
+	menu_coords 0, 2, SCREEN_WIDTH - 13, TEXTBOX_Y
 	dw .MenuData
 	db 1 ; default option
 
@@ -332,7 +331,7 @@ Jumptable_UseGiveTossRegisterQuit:
 
 MenuHeader_UsableItem:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 3, SCREEN_WIDTH - 14, TEXTBOX_Y - 1
+	menu_coords 0, 3, SCREEN_WIDTH - 13, TEXTBOX_Y - 1
 	dw .MenuData
 	db 1 ; default option
 
@@ -352,7 +351,7 @@ Jumptable_UseGiveTossQuit:
 
 MenuHeader_UnusableItem:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 7, SCREEN_WIDTH - 14, TEXTBOX_Y - 1
+	menu_coords 0, 7, SCREEN_WIDTH - 13, TEXTBOX_Y - 1
 	dw .MenuData
 	db 1 ; default option
 
@@ -368,7 +367,7 @@ Jumptable_UseQuit:
 
 MenuHeader_UnusableKeyItem:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 5, SCREEN_WIDTH - 14, TEXTBOX_Y - 1
+	menu_coords 0, 5, SCREEN_WIDTH - 13, TEXTBOX_Y - 1
 	dw .MenuData
 	db 1 ; default option
 
@@ -386,7 +385,7 @@ Jumptable_UseRegisterQuit:
 
 MenuHeader_HoldableKeyItem:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 3, SCREEN_WIDTH - 14, TEXTBOX_Y - 1
+	menu_coords 0, 3, SCREEN_WIDTH - 13, TEXTBOX_Y - 1
 	dw .MenuData
 	db 1 ; default option
 
@@ -406,7 +405,7 @@ Jumptable_GiveTossRegisterQuit:
 
 MenuHeader_HoldableItem:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 5, SCREEN_WIDTH - 14, TEXTBOX_Y - 1
+	menu_coords 0, 5, SCREEN_WIDTH - 13, TEXTBOX_Y - 1
 	dw .MenuData
 	db 1 ; default option
 
@@ -456,8 +455,7 @@ UseItem:
 	xor a
 	ldh [hBGMapMode], a
 	call Pack_InitGFX
-	call WaitBGMap_DrawPackGFX
-	call Pack_InitColors
+	call Pack_InitColorsBluegreen
 	ret
 
 .NoPokemon:
@@ -499,34 +497,6 @@ TossMenu:
 .finish
 	ret
 
-ResetPocketCursorPositions: ; unreferenced
-	ld a, [wCurPocket]
-	and a ; ITEM_POCKET
-	jr z, .items
-	dec a ; BALL_POCKET
-	jr z, .balls
-	dec a ; KEY_ITEM_POCKET
-	jr z, .key
-	ret
-
-.balls
-	xor a
-	ld [wBallsPocketCursor], a
-	ld [wBallsPocketScrollPosition], a
-	ret
-
-.items
-	xor a
-	ld [wItemsPocketCursor], a
-	ld [wItemsPocketScrollPosition], a
-	ret
-
-.key
-	xor a
-	ld [wKeyItemsPocketCursor], a
-	ld [wKeyItemsPocketScrollPosition], a
-	ret
-
 RegisterItem:
 	farcall CheckSelectableItem
 	ld a, [wItemAttributeParamBuffer]
@@ -555,6 +525,67 @@ RegisterItem:
 	ld hl, CantRegisterText
 	call Pack_PrintTextNoScroll
 	ret
+
+GiveItemTM:
+	ld a, [wPartyCount]
+	and a
+	jp z, .NoPokemon
+	ld a, [wOptions]
+	push af
+	res NO_TEXT_SCROLL, a
+	ld [wOptions], a
+	ld a, PARTYMENUACTION_GIVE_ITEM
+	ld [wPartyMenuActionText], a
+	call ClearBGPalettes
+	farcall LoadPartyMenuGFX
+	farcall InitPartyMenuWithCancel
+	farcall InitPartyMenuGFX
+.loop
+	farcall WritePartyMenuTilemap
+	farcall PrintPartyMenuText
+	call WaitBGMap
+	call SetPalettes
+	call DelayFrame
+	farcall PartyMenuSelect
+	jr c, .finish
+	ld a, [wCurPartySpecies]
+	cp EGG
+	jr nz, .give
+	ld hl, .AnEggCantHoldAnItemText
+	call PrintText
+	jr .loop
+
+.give
+	ld a, [wJumptableIndex]
+	push af
+	ld a, [wPackJumptableIndex]
+	push af
+	call GetCurNick
+	ld hl, wStringBuffer1
+	ld de, wMonOrItemNameBuffer
+	ld bc, MON_NAME_LENGTH
+	call CopyBytes
+	call TryGiveItemToPartymon
+	pop af
+	ld [wPackJumptableIndex], a
+	pop af
+	ld [wJumptableIndex], a
+.finish
+	pop af
+	ld [wOptions], a
+	xor a
+	ldh [hBGMapMode], a
+	call Pack_InitGFX
+	call Pack_InitColorsYellowred
+	ret
+
+.NoPokemon:
+	ld hl, YouDontHaveAMonText
+	call Pack_PrintTextNoScroll
+	ret
+.AnEggCantHoldAnItemText:
+	text_far _AnEggCantHoldAnItemText
+	text_end
 
 GiveItem:
 	ld a, [wPartyCount]
@@ -606,8 +637,7 @@ GiveItem:
 	xor a
 	ldh [hBGMapMode], a
 	call Pack_InitGFX
-	call WaitBGMap_DrawPackGFX
-	call Pack_InitColors
+	call Pack_InitColorsBluegreen
 	ret
 
 .NoPokemon:
@@ -667,7 +697,7 @@ BattlePack:
 	call Pack_InitGFX
 	ld a, [wPackJumptableIndex]
 	ld [wJumptableIndex], a
-	call Pack_InitColors
+	call Pack_InitColorsBluegreen
 	ret
 
 .InitItemsPocket:
@@ -675,8 +705,8 @@ BattlePack:
 	ld [wCurPocket], a
 	call ClearPocketList
 	call DrawPocketName
-	call WaitBGMap_DrawPackGFX
 	call Pack_JumptableNext
+	call Pack_InitColorsBluegreen
 	ret
 
 .ItemsPocketMenu:
@@ -703,8 +733,8 @@ BattlePack:
 	ld [wCurPocket], a
 	call ClearPocketList
 	call DrawPocketName
-	call WaitBGMap_DrawPackGFX
 	call Pack_JumptableNext
+	call Pack_InitColorsYellowred
 	ret
 
 .KeyItemsPocketMenu:
@@ -733,10 +763,10 @@ BattlePack:
 	call DrawPocketName
 	xor a
 	ldh [hBGMapMode], a
-	call WaitBGMap_DrawPackGFX
 	ld hl, PackEmptyText
 	call Pack_PrintTextNoScroll
 	call Pack_JumptableNext
+	call Pack_InitColorsYellowred
 	ret
 
 .TMHMPocketMenu:
@@ -754,8 +784,8 @@ BattlePack:
 	ld [wCurPocket], a
 	call ClearPocketList
 	call DrawPocketName
-	call WaitBGMap_DrawPackGFX
 	call Pack_JumptableNext
+	call Pack_InitColorsBluegreen
 	ret
 
 .BallsPocketMenu:
@@ -802,9 +832,9 @@ TMHMSubmenu:
 	call Pack_GetJumptablePointer
 	jp hl
 
-.UsableMenuHeader:
+.UsableMenuHeader:;MENU BATALLA
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 7, TEXTBOX_HEIGHT, TEXTBOX_Y - 1
+	menu_coords 0, 7, SCREEN_WIDTH - 13, TEXTBOX_Y - 1
 	dw .UsableMenuData
 	db 1 ; default option
 
@@ -820,7 +850,7 @@ TMHMSubmenu:
 
 .UnusableMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 0, 9, SCREEN_WIDTH - 14, TEXTBOX_Y - 1
+	menu_coords 0, 9, SCREEN_WIDTH - 13, TEXTBOX_Y - 1
 	dw .UnusableMenuData
 	db 1 ; default option
 
@@ -869,8 +899,7 @@ TMHMSubmenu:
 	xor a
 	ldh [hBGMapMode], a
 	call Pack_InitGFX
-	call WaitBGMap_DrawPackGFX
-	call Pack_InitColors
+	call Pack_InitColorsBluegreen
 	ret
 
 .ReturnToBattle:
@@ -922,7 +951,7 @@ DepositSellInitPackBuffers:
 	ld [wPackUsedItem], a
 	ld [wSwitchItem], a
 	call Pack_InitGFX
-	call Pack_InitColors
+	call Pack_InitColorsBluegreen
 	ret
 
 DepositSellPack:
@@ -946,6 +975,7 @@ DepositSellPack:
 	dw .TMHMPocket
 
 .ItemsPocket:
+	call Pack_InitColorsBluegreen
 	xor a ; ITEM_POCKET
 	call InitPocket
 	ld hl, PC_Mart_ItemsPocketMenuHeader
@@ -962,6 +992,7 @@ DepositSellPack:
 	ret
 
 .KeyItemsPocket:
+	call Pack_InitColorsYellowred
 	ld a, KEY_ITEM_POCKET
 	call InitPocket
 	ld hl, PC_Mart_KeyItemsPocketMenuHeader
@@ -978,15 +1009,16 @@ DepositSellPack:
 	ret
 
 .TMHMPocket:
+	call Pack_InitColorsYellowred
 	ld a, TM_HM_POCKET
 	call InitPocket
-	call WaitBGMap_DrawPackGFX
 	farcall TMHMPocket
 	ld a, [wCurItem]
 	ld [wCurItem], a
 	ret
 
 .BallsPocket:
+	call Pack_InitColorsBluegreen
 	ld a, BALL_POCKET
 	call InitPocket
 	ld hl, PC_Mart_BallsPocketMenuHeader
@@ -1006,7 +1038,6 @@ InitPocket:
 	ld [wCurPocket], a
 	call ClearPocketList
 	call DrawPocketName
-	call WaitBGMap_DrawPackGFX
 	ret
 
 DepositSellTutorial_InterpretJoypad:
@@ -1096,7 +1127,7 @@ TutorialPack:
 
 .ItemsMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 3, 3, SCREEN_WIDTH - 5, TEXTBOX_Y - 2
+	menu_coords 3, 3, SCREEN_WIDTH - 4, TEXTBOX_Y - 2
 	dw .ItemsMenuData
 	db 1 ; default option
 
@@ -1116,7 +1147,7 @@ TutorialPack:
 
 .KeyItemsMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 3, 3, SCREEN_WIDTH - 5, TEXTBOX_Y - 2
+	menu_coords 3, 3, SCREEN_WIDTH - 4, TEXTBOX_Y - 2
 	dw .KeyItemsMenuData
 	db 1 ; default option
 
@@ -1132,7 +1163,6 @@ TutorialPack:
 .TMHM:
 	ld a, TM_HM_POCKET
 	call InitPocket
-	call WaitBGMap_DrawPackGFX
 	farcall TMHMPocket
 	ld a, [wCurItem]
 	ld [wCurItem], a
@@ -1145,7 +1175,7 @@ TutorialPack:
 
 .BallsMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 3, 3, SCREEN_WIDTH - 5, TEXTBOX_Y - 2
+	menu_coords 3, 3, SCREEN_WIDTH - 4, TEXTBOX_Y - 2
 	dw .BallsMenuData
 	db 1 ; default option
 
@@ -1204,30 +1234,6 @@ Pack_PrintTextNoScroll:
 	pop af
 	ld [wOptions], a
 	ret
-
-WaitBGMap_DrawPackGFX:
-	call WaitBGMap
-DrawPackGFX:
-	ld a, [wCurPocket]
-	maskbits NUM_POCKETS
-	ld e, a
-	ld d, 0
-	ld hl, PackGFXPointers
-	add hl, de
-	add hl, de
-	ld a, [hli]
-	ld e, a
-	ld d, [hl]
-	ld hl, vTiles2 tile $50
-	lb bc, BANK(PackGFX), 15
-	call Request2bpp
-	ret
-
-PackGFXPointers:
-	dw PackGFX + (15 tiles) * 1 ; ITEM_POCKET
-	dw PackGFX + (15 tiles) * 3 ; BALL_POCKET
-	dw PackGFX + (15 tiles) * 0 ; KEY_ITEM_POCKET
-	dw PackGFX + (15 tiles) * 2 ; TM_HM_POCKET
 
 Pack_InterpretJoypad:
 	ld hl, wMenuJoypad
@@ -1318,15 +1324,15 @@ Pack_InitGFX:
 	call ClearTilemap
 	call ClearSprites
 	call DisableLCD
-    hlcoord 3, 1
-    ld a, $20
+    hlcoord 4, 1
+    ld a, $24
     ld [hli], a
     hlcoord 15, 1
-    ld a, $1f
+    ld a, $25
     ld [hli], a 
 	ld hl, PackMenuGFX
 	ld de, vTiles2
-	ld bc, $60 tiles
+	ld bc, $30 tiles
 	ld a, BANK(PackMenuGFX)
 	call FarCopyBytes
 ; This is where the items themselves will be listed.
@@ -1344,11 +1350,11 @@ Pack_InitGFX:
 	lb bc, 4, SCREEN_WIDTH - 2
 	call Textbox
     hlcoord 2, 2
-    lb bc, 8, 13
+    lb bc, 8, 14
     call Textbox
     call LoadFontsExtra
 	call EnableLCD
-	call DrawPackGFX
+	;call DrawPackGFX
 	ret
 
 DrawPocketName:
@@ -1383,8 +1389,8 @@ DrawPocketName:
 	jr nz, .row
 	ret
 
-.tilemap: ; 5x12
-; the 5x3 pieces correspond to *_POCKET constants
+.tilemap: ; 9x4
+; the 9x1 pieces correspond to *_POCKET constants
 INCBIN "gfx/pack/pack_menu.tilemap"
 
 Pack_GetItemName:
@@ -1394,22 +1400,23 @@ Pack_GetItemName:
 	call CopyName1
 	ret
 
-Pack_ClearTilemap: ; unreferenced
-	hlcoord 0, 0
-	ld bc, SCREEN_WIDTH * SCREEN_HEIGHT
-	ld a, " "
-	call ByteFill
-	ret
-
 ClearPocketList: ; Box Around List
 	hlcoord 2, 2
-	lb bc, 8, 13
+	lb bc, 8, 14
 	call Textbox
 	ret
 
-Pack_InitColors:
+Pack_InitColorsBluegreen:
 	call WaitBGMap
-	ld b, SCGB_PACKPALS
+	ld b, SCGB_PACKPALS_BLUEGREEN
+	call GetSGBLayout
+	call SetPalettes
+	call DelayFrame
+	ret
+
+Pack_InitColorsYellowred:
+	call WaitBGMap
+	ld b, SCGB_PACKPALS_YELLOWRED
 	call GetSGBLayout
 	call SetPalettes
 	call DelayFrame
@@ -1417,7 +1424,7 @@ Pack_InitColors:
 
 ItemsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 3, 3, SCREEN_WIDTH - 5, TEXTBOX_Y - 2
+	menu_coords 3, 3, SCREEN_WIDTH - 4, TEXTBOX_Y - 2
 	dw .MenuData
 	db 1 ; default option
 
@@ -1432,7 +1439,7 @@ ItemsPocketMenuHeader:
 
 PC_Mart_ItemsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 3, 3, SCREEN_WIDTH - 5, TEXTBOX_Y - 2
+	menu_coords 3, 3, SCREEN_WIDTH - 4, TEXTBOX_Y - 2
 	dw .MenuData
 	db 1 ; default option
 
@@ -1447,7 +1454,7 @@ PC_Mart_ItemsPocketMenuHeader:
 
 KeyItemsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 3, 3, SCREEN_WIDTH - 5, TEXTBOX_Y - 2
+	menu_coords 3, 3, SCREEN_WIDTH - 4, TEXTBOX_Y - 2
 	dw .MenuData
 	db 1 ; default option
 
@@ -1462,7 +1469,7 @@ KeyItemsPocketMenuHeader:
 
 PC_Mart_KeyItemsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 3, 3, SCREEN_WIDTH - 5, TEXTBOX_Y - 2
+	menu_coords 3, 3, SCREEN_WIDTH - 4, TEXTBOX_Y - 2
 	dw .MenuData
 	db 1 ; default option
 
@@ -1477,7 +1484,7 @@ PC_Mart_KeyItemsPocketMenuHeader:
 
 BallsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 3, 3, SCREEN_WIDTH - 5, TEXTBOX_Y - 2
+	menu_coords 3, 3, SCREEN_WIDTH - 4, TEXTBOX_Y - 2
 	dw .MenuData
 	db 1 ; default option
 
@@ -1492,7 +1499,7 @@ BallsPocketMenuHeader:
 
 PC_Mart_BallsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
-	menu_coords 3, 3, SCREEN_WIDTH - 5, TEXTBOX_Y - 2
+	menu_coords 3, 3, SCREEN_WIDTH - 4, TEXTBOX_Y - 2
 	dw .MenuData
 	db 1 ; default option
 
@@ -1551,5 +1558,3 @@ YouCantUseItInABattleText: ; unreferenced
 
 PackMenuGFX:
 INCBIN "gfx/pack/pack_menu.2bpp"
-PackGFX:
-INCBIN "gfx/pack/pack.2bpp"

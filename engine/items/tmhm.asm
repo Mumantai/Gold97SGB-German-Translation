@@ -76,6 +76,7 @@ ChooseMonToLearnTMHM:
 	ld bc, MOVE_NAME_LENGTH - 1
 	call CopyBytes
 	call ClearBGPalettes
+ChooseMonToLearnTMHM_NoRefresh:
 	farcall LoadPartyMenuGFX
 	farcall InitPartyMenuWithCancel
 	farcall InitPartyMenuGFX
@@ -85,6 +86,7 @@ ChooseMonToLearnTMHM:
 	farcall WritePartyMenuTilemap
 	farcall PrintPartyMenuText
 	call WaitBGMap
+	call TM_InitColorsBW
 	call SetPalettes
 	call DelayFrame
 	farcall PartyMenuSelect
@@ -328,11 +330,8 @@ TMHM_DisplayPocketItems:
 	ld a, [wBattleType]
 	cp BATTLETYPE_TUTORIAL
 	jp z, Tutorial_TMHMPocket
-	
-	
-
 	hlcoord 2, 2
-	lb bc, 8, 13
+	lb bc, 8, 14
 	ld a, " "
 	call Textbox
 	call TMHM_GetCurrentPocketPosition
@@ -568,4 +567,10 @@ CountTMsHMs:
 	jr nz, .loop
 	ld a, b
 	ld [wTempTMHM], a
+	ret
+
+TM_InitColorsBW:
+	ld b, SCGB_PARTY_MENU
+	call GetSGBLayout
+	call SetPalettes
 	ret

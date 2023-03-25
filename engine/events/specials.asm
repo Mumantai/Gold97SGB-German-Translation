@@ -32,6 +32,18 @@ GameCornerPrizeMonCheckDex:
 	farcall NewPokedexEntry
 	call ExitAllMenus
 	ret
+	
+ShowPokedexEntry: ; erosunica: used to splash the pokédex from an overworld event
+	ld a, [wScriptVar]
+	dec a
+;	call SetSeenMon
+	call FadeToMenu
+	ld a, [wScriptVar]
+	ld [wNamedObjectIndexBuffer], a
+	farcall NewPokedexEntry
+	call EnableSpriteUpdates ; new
+	call ExitAllMenus
+	ret
 
 UnusedSetSeenMon:
 	ld a, [wScriptVar]
@@ -95,6 +107,19 @@ ELIF DEF(_SILVER)
 ENDC
 
 NameMom:
+	farcall ShowMomNamingChoices
+	ld a, [wMenuCursorY]
+	dec a
+	jr z, .NewName
+	ld a, "@"
+	ld bc, NAME_LENGTH
+	ld hl, wMomsName
+	call ByteFill
+	ld hl, wMomsName
+	ld de, wStringBuffer2
+	call CopyName2
+	ret
+.NewName:
 	ld b, NAME_MOM
 	ld de, wMomsName
 	farcall _NamingScreen
@@ -104,7 +129,7 @@ NameMom:
 	call InitName
 	ret
 	
-	.default
+.default
 	db "MOMMY@"
 
 NameRater:
